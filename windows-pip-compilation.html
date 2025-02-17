@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <title>Python Package Compilation in Windows using MSVC &amp; Rust</title>
+        <meta name="robots" content="noindex, nofollow" />
+    </head>
+    <body>
+        <h1>Python Package Compilation in Windows using MSVC &amp; Rust</h1>
+        <p>This page details the steps that I went through to setup
+            MSVC (Microsoft) C/C++ compilation and Rust compilation for Python packages
+            when installing using 'pip'.</p>
+        <p><b>NOTE:</b> I did investigate if it was practical to use the MinGW C/C++
+             compiler instead of Microsoft's MSVC compiler, but two problems became clear:</p>
+        <ul>
+            <li>The documentation for installing MinGW in Windows for compiling Python packages
+                is insufficient to get a good result.</li>
+            <li>MSVC is the compiler used for office pre-compiled Python packages for Windows,
+                and so it only creates a risk to be using a different compiler
+                that isn't widely used or tested for Python packages or Windows.
+            </li>
+        </ul>
+
+        <h1>Installation &amp; Testing Steps</h1>
+        <ol>
+            <li>Testing this in Windows 11 Pro, but it should also work in Windows 10 or Windows Server 2016.</li>
+            <li>Using Winget, installed 'Maximus5.ConEmu', version '11.230.7240' (which just appears to be the latest 23/07/24 version) - left all the settings as the defaults</li>
+            <li>Using ConEmu as the terminal for this</li>
+            <li>I used some of the Anaconda3 'base' files to be able to create a Python environment (but any basic Python installation will do)</li>
+            <li><pre>path=C:\Users\tony\anaconda3;C:\Users\tony\anaconda3\Scripts;%PATH%</pre></li>
+            <li><pre>python --version</pre><ul>
+                <li> gives: 3.12.3</li>
+            </ul></li>
+            <li><pre>mkdir dev\venv\pip-compile</pre></li>
+            <li><pre>python -m venv dev\venv\pip-compile</pre></li>
+            <li><pre>dev\venv\pip-compile\Scripts\activate</pre></li>
+            <li><pre>python.exe -m pip install --upgrade pip</pre></li>
+            <li>Now I need the MSVC C/C++ compiler - Visual Studio in all of its glory is too much, so I'm installing '<a href="https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022">Build Tools for Visual Studio 2022</a>' instead</li>
+            <li>Build Tools for Visual Studio 2022 requires a Visual Studio licence, *but* it can be a Community Edition licence</li>
+            <li>Installed Build Tools for Visual Studio 2022, including the Windows 11 SDK - see selected options in screenshot<br/>
+                <img alt="Build Tools for Visual Studio 2022 - installation screen" src="img/build-tools-for-visual-studio-2022.png"/></li>
+            <li>Using Winget, installed 'Rustlang.Rustup', version '1.27.1'</li>
+            <li><b>Now restart the ConEmu terminal to pick up the MSVC and Rust settings.  You will nee to 'activiate' the Python virtual environment again</b></li>
+            <li>The paths for MSVC have to be set up, as well as compiler hints for 'pip'.  There is nothing to do for Rust.</li>
+            <li><pre>set CC=cl</pre></li>
+            <li><pre>set CXX=cl</pre></li>
+            <li><pre>path=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.43.34808\bin\HostX64\x64;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\VC\VCPackages;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\CommonExtensions\Microsoft\TestWindow;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\bin\Roslyn;C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\x64\;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\Extensions\Microsoft\CodeCoverage.Console;C:\Program Files (x86)\Windows Kits\10\bin\10.0.26100.0\\x64;C:\Program Files (x86)\Windows Kits\10\bin\\x64;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\\MSBuild\Current\Bin\amd64;C:\Windows\Microsoft.NET\Framework64\v4.0.30319;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\IDE\;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\Common7\Tools\;%PATH%</pre></li>
+            <li><pre>path=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build;%PATH%</pre></li>
+            <li><pre>vcvars64.bat</pre></li>
+            <li>Now the Python 'attrs' package can be used to test the MSVC setup</li>
+            <li><pre>pip install --no-deps --no-binary :all: attrs --force --verbose</pre></li>
+            <li>The Python 'pywinpty' can be used to test the Rust setup as well</li>
+            <li><pre>pip install --no-deps --no-binary :all: pywinpty --force --verbose</pre></li>
+        </ol>
+    </body>
+</html>
